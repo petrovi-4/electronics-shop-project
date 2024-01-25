@@ -1,3 +1,7 @@
+import csv
+from src.config import ROOT_DIR
+
+
 class Item:
     """
     Класс для представления товара в магазине.
@@ -13,10 +17,20 @@ class Item:
         :param price: Цена за единицу товара.
         :param quantity: Количество товара в магазине.
         """
-        self.name = name
+        self._name = name
         self.price = price
         self.quantity = quantity
-        Item.all.append(self)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        if len(value) > 10:
+            self._name = value[:10]
+        else:
+            self._name = value
 
     def calculate_total_price(self) -> float:
         """
@@ -32,3 +46,32 @@ class Item:
         Применяет установленную скидку для конкретного товара.
         """
         self.price *= self.pay_rate
+
+    @classmethod
+    def instantiate_from_csv(cls, filename: str) -> None:
+        filepath = ROOT_DIR / filename
+
+        with open(filepath, newline='', encoding='windows-1251') as csvfile:
+            reader = csv.DictReader(csvfile)
+
+            for row in reader:
+                name = row['name']
+                price = float(row['price'])
+                quantity = int(row['quantity'])
+                item = cls(name, price, quantity)
+                cls.all.append(item)
+
+    @staticmethod
+    def string_to_number(num_str: str) -> float:
+        return int(float(num_str))
+
+
+if __name__ == '__main__':
+    Item.instantiate_from_csv('items.csv')  # оставляем имя файла без изменений
+    print("Actual items:")
+    for item in Item.all:
+        print(item.name, item.price, item.quantity)  # Выводим имена всех
+        # элементов
+        # для отладки
+    assert len(Item.all) == 5  # в файле 5 записей с данными по товарам
+    print("Assertion passed successfully.")
