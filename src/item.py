@@ -17,20 +17,21 @@ class Item:
         :param price: Цена за единицу товара.
         :param quantity: Количество товара в магазине.
         """
-        self._name = name
+        self.__name = name
         self.price = price
         self.quantity = quantity
+        self.all.append(self)
 
     @property
     def name(self) -> str:
-        return self._name
+        return self.__name
 
     @name.setter
     def name(self, value: str) -> None:
         if len(value) > 10:
-            self._name = value[:10]
+            self.__name = value[:10]
         else:
-            self._name = value
+            self.__name = value
 
     def calculate_total_price(self) -> float:
         """
@@ -49,6 +50,8 @@ class Item:
 
     @classmethod
     def instantiate_from_csv(cls, filename: str) -> None:
+        cls.clear_all()
+
         filepath = ROOT_DIR / filename
 
         with open(filepath, newline='', encoding='windows-1251') as csvfile:
@@ -59,7 +62,11 @@ class Item:
                 price = float(row['price'])
                 quantity = int(row['quantity'])
                 item = cls(name, price, quantity)
-                cls.all.append(item)
+
+
+    @classmethod
+    def clear_all(cls):
+        cls.all = []
 
     @staticmethod
     def string_to_number(num_str: str) -> float:
