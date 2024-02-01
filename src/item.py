@@ -22,6 +22,13 @@ class Item:
         self.quantity = quantity
         self.all.append(self)
 
+    def __repr__(self) -> str:
+        return (f"{self.__class__.__name__}('{self.__name}', {self.price}, "
+                f"{self.quantity})")
+
+    def __str__(self) -> str:
+        return self.__name
+
     @property
     def name(self) -> str:
         return self.__name
@@ -74,6 +81,7 @@ class Item:
 
 
 if __name__ == '__main__':
+    item1 = Item("Смартфон", 10000, 20)
     Item.instantiate_from_csv('items.csv')  # оставляем имя файла без изменений
     print("Actual items:")
     for item in Item.all:
@@ -82,3 +90,5 @@ if __name__ == '__main__':
         # для отладки
     assert len(Item.all) == 5  # в файле 5 записей с данными по товарам
     print("Assertion passed successfully.")
+    print(repr(item1))
+    print(str(item1))
