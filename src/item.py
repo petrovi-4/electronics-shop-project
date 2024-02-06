@@ -1,4 +1,5 @@
 import csv
+
 from src.config import ROOT_DIR
 
 
@@ -28,6 +29,16 @@ class Item:
 
     def __str__(self) -> str:
         return self.__name
+
+    def __add__(self, other):
+        if not isinstance(other, Item):
+            raise TypeError(
+                "unsupported operand type(s) for +: 'Phone' and '{}'".format(
+                    type(other).__name__
+                )
+            )
+        result = self.quantity + other.quantity
+        return result
 
     @property
     def name(self) -> str:
@@ -70,7 +81,6 @@ class Item:
                 quantity = int(row['quantity'])
                 item = cls(name, price, quantity)
 
-
     @classmethod
     def clear_all(cls):
         cls.all = []
@@ -78,6 +88,10 @@ class Item:
     @staticmethod
     def string_to_number(num_str: str) -> float:
         return int(float(num_str))
+
+
+class IncompatibleTypeError(TypeError):
+    pass
 
 
 if __name__ == '__main__':
