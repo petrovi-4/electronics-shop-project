@@ -22,3 +22,9 @@ def test_add_phone_and_invalid_object():
     other_object = 'some_object'
     with pytest.raises(TypeError):
         result = phone + other_object
+
+
+def test_invalid_number_of_sim():
+    with pytest.raises(ValueError):
+        phone = Phone('iPhone', 10000, 5, 2)
+        phone.number_of_sim = 0
