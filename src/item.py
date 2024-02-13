@@ -1,5 +1,5 @@
 import csv
-
+import chardet
 from src.config import ROOT_DIR
 
 
@@ -67,19 +67,28 @@ class Item:
         self.price *= self.pay_rate
 
     @classmethod
-    def instantiate_from_csv(cls, filename: str) -> None:
+    def instantiate_from_csv(cls, filename: str = 'item.csv') -> None:
         cls.clear_all()
 
-        filepath = ROOT_DIR / filename
+        try:
+            filepath = ROOT_DIR / filename
+            with open(filepath, 'rb') as f:
+                result = chardet.detect(f.read())
+                encoding = result['encoding']
 
-        with open(filepath, newline='', encoding='windows-1251') as csvfile:
-            reader = csv.DictReader(csvfile)
+            with open(filepath, newline='', encoding=encoding) as csvfile:
+                reader = csv.DictReader(csvfile)
 
-            for row in reader:
-                name = row['name']
-                price = float(row['price'])
-                quantity = int(row['quantity'])
-                item = cls(name, price, quantity)
+                for row in reader:
+                    if 'name' not in row or 'price' not in row or 'quantity' not in row:
+                        raise InstantiateCSVError("Файл item.csv поврежден")
+
+                    name = row['name']
+                    price = float(row['price'])
+                    quantity = int(row['quantity'])
+                    item = cls(name, price, quantity)
+        except FileNotFoundError:
+            raise FileNotFoundError("Отсутствует файл item.csv")
 
     @classmethod
     def clear_all(cls):
@@ -91,6 +100,10 @@ class Item:
 
 
 class IncompatibleTypeError(TypeError):
+    pass
+
+
+class InstantiateCSVError(Exception):
     pass
 
 

@@ -3,7 +3,7 @@ from typing import List
 import pytest
 
 from src.config import ROOT_DIR
-from src.item import Item
+from src.item import Item, InstantiateCSVError
 
 
 def test_add_item_to_item():
@@ -101,3 +101,17 @@ def test_item_repr():
 def test_item_str():
     item = Item('Смартфон', 10000.0, 5)
     assert str(item) == 'Смартфон'
+
+
+def test_instantiate_from_csv_file_not_found():
+    with pytest.raises(FileNotFoundError):
+        Item.instantiate_from_csv('non_existent_file.csv')
+
+
+def test_instantiate_from_csv_corrupted_file(tmp_path):
+    filepath = tmp_path / 'corrupted_file.csv'
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write("name,price\nСмартфон,10000\n")
+
+    with pytest.raises(InstantiateCSVError):
+        Item.instantiate_from_csv(filepath)
